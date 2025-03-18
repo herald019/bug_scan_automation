@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bug Bounty Scanner</title>
+    <script>
+        function startScan() {
+            let targetUrl = document.getElementById("targetUrl").value;
+            if (!targetUrl) {
+                alert("Please enter a valid URL");
+                return;
+            }
+
+            fetch(`http://127.0.0.1:5000/scan?url=${encodeURIComponent(targetUrl)}`)
+                .then(response => response.json())
+                .then(data => alert(data.message))
+                .catch(error => alert("Error: " + error));
+        }
+
+        function getResults() {
+            fetch('http://127.0.0.1:5000/results')
+                .then(response => response.json())
+                .then(data => {
+                    let resultDiv = document.getElementById("results");
+                    resultDiv.innerHTML = "<h3>Scan Results</h3><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+                })
+                .catch(error => alert("Error: " + error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Bug Bounty Scanner</h1>
+    <label for="targetUrl">Enter Target URL:</label>
+    <input type="text" id="targetUrl" placeholder="https://example.com">
+    <button onclick="startScan()">Start Scan</button>
+    <button onclick="getResults()">View Results</button>
+    <div id="results"></div>
+</body>
+</html>
