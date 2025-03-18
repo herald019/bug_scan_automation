@@ -51,9 +51,14 @@ def scan():
 def get_results():
     try:
         df = pd.read_json('table.json')
+
+        # Keep only the necessary columns
+        df = df[['alert', 'risk', 'confidence', 'description', 'solution', 'reference']]
+
         return jsonify(df.to_dict(orient="records"))
     except Exception as e:
         return jsonify({"error": str(e)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
