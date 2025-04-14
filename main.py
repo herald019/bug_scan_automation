@@ -54,7 +54,7 @@ def get_results():
 
         # Keep only the necessary columns
         df = df[['alert', 'risk', 'confidence', 'description', 'solution', 'reference']]
-
+        df = df.drop_duplicates()
         return jsonify(df.to_dict(orient="records"))
     except Exception as e:
         return jsonify({"error": str(e)})

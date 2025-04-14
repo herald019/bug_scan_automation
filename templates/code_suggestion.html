@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bug Bounty Scanner - Code Suggestions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(90deg, #d53e33, #7c4fe4);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            background-color: #fff;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .nav-links a.active {
+            color: #4CAF50;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .login-btn {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #5871ed;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .login-icon {
+            margin-right: 8px;
+        }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 80px);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sidebar {
+            width: 350px;
+            background-color: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .sidebar-search {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .sidebar-search input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .sidebar-categories {
+            padding: 0;
+        }
+        
+        .category {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .category-header {
+            padding: 15px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-header.high {
+            color: #d40000;
+            background-color: rgba(255, 100, 100, 0.1);
+        }
+        
+        .category-header.medium {
+            color: #cc5500;
+            background-color: rgba(255, 165, 0, 0.1);
+        }
+        
+        .category-header.low {
+            color: #006400;
+            background-color: rgba(100, 255, 100, 0.1);
+        }
+        
+        .category-count {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+        
+        .vulnerability-list {
+            display: none;
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .vulnerability-list.active {
+            display: block;
+        }
+        
+        .vulnerability-item {
+            padding: 12px 20px 12px 30px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .vulnerability-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .vulnerability-item.selected {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .suggestion-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2px;
+        }
+        
+        .suggestion-header h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .suggestion-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .issue-details {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .code-area {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .code-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .code-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .code-tab.active {
+            border-bottom: 2px solid #1890ff;
+            color: #1890ff;
+        }
+        
+        .code-panel {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .code-panel.active {
+            display: flex;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .code-title {
+            font-weight: bold;
+        }
+        
+        .code-actions button {
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .code-container {
+            flex-grow: 1;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        
+        .code-input {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        
+        .suggestion-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .suggestion-btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .get-suggestion {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+        }
+        
+        .copy-code {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+        }
+        
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+    <script>
+        // Function to get URL parameters
+        function getParameterByName(name) {
+            const url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Load vulnerabilities from the results API
+        function loadVulnerabilities() {
+            fetch('http://127.0.0.1:5000/results')
+                .then(response => response.json())
+                .then(data => {
+                    displayVulnerabilities(data);
+                    updateCategoryCounts(data);
+                })
+                .catch(error => {
+                    console.error("Error loading vulnerabilities:", error);
+                });
+        }
+
+        // Display vulnerabilities in the sidebar
+        function displayVulnerabilities(data) {
+            const highList = document.getElementById('highRiskList');
+            const mediumList = document.getElementById('mediumRiskList');
+            const lowList = document.getElementById('lowRiskList');
+            
+            highList.innerHTML = '';
+            mediumList.innerHTML = '';
+            lowList.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'vulnerability-item';
+                li.textContent = item.alert;
+                li.dataset.id = index;
+                li.dataset.risk = item.risk.toLowerCase();
+                
+                li.addEventListener('click', function() {
+                    // Remove selected class from all items
+                    document.querySelectorAll('.vulnerability-item').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked item
+                    this.classList.add('selected');
+                    
+                    // Show vulnerability details and suggestion area
+                    displayVulnerabilityDetails(data[this.dataset.id]);
+                });
+                
+                if (item.risk === 'High') {
+                    highList.appendChild(li);
+                } else if (item.risk === 'Medium') {
+                    mediumList.appendChild(li);
+                } else if (item.risk === 'Low') {
+                    lowList.appendChild(li);
+                }
+            });
+        }
+
+        // Update category counts
+        function updateCategoryCounts(data) {
+            const highCount = data.filter(item => item.risk === 'High').length;
+            const mediumCount = data.filter(item => item.risk === 'Medium').length;
+            const lowCount = data.filter(item => item.risk === 'Low').length;
+            
+            document.getElementById('highCount').textContent = highCount;
+            document.getElementById('mediumCount').textContent = mediumCount;
+            document.getElementById('lowCount').textContent = lowCount;
+        }
+
+        // Display vulnerability details in the main content area
+        function displayVulnerabilityDetails(vulnerability) {
+            document.getElementById('issueTitle').textContent = vulnerability.alert;
+            document.getElementById('issueRisk').textContent = vulnerability.risk;
+            document.getElementById('issueConfidence').textContent = vulnerability.confidence;
+            
+            const issueDetails = document.getElementById('issueDetails');
+            issueDetails.innerHTML = `
+                <p><strong>Description:</strong> ${vulnerability.description || 'No description available'}</p>
+                <p><strong>Solution:</strong> ${vulnerability.solution || 'No solution available'}</p>
+                ${vulnerability.reference ? `<p><strong>Reference:</strong> <a href="${vulnerability.reference}" target="_blank">${vulnerability.reference}</a></p>` : ''}
+            `;
+            
+            // Reset code suggestions
+            document.getElementById('suggestedCode').textContent = 'Click "Get Code Suggestions" to receive AI-generated code recommendations based on this vulnerability.';
+        }
+
+        // Toggle category lists
+        function toggleCategory(category) {
+            const list = document.getElementById(`${category}List`);
+            if (list) {
+                list.classList.toggle('active');
+            }
+        }
+
+        // Switch between code tabs
+        function switchTab(tabName) {
+            // Hide all panels
+            document.querySelectorAll('.code-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.code-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected panel
+            document.getElementById(`${tabName}Panel`).classList.add('active');
+            
+            // Activate the selected tab
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+
+        // Get code suggestions based on selected vulnerability and user code
+        function getCodeSuggestions() {
+            const selectedVulnerability = document.querySelector('.vulnerability-item.selected');
+            if (!selectedVulnerability) {
+                alert('Please select a vulnerability first');
+                return;
+            }
+            
+            const userCode = document.getElementById('userCode').value;
+            const vulnerabilityId = selectedVulnerability.dataset.id;
+            
+            // Show loading indicator
+            document.getElementById('suggestedCode').textContent = 'Generating code suggestions...';
+            
+            // Call API to get suggestions (to be implemented)
+            fetch('http://127.0.0.1:5000/suggest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vulnerabilityId: vulnerabilityId,
+                    userCode: userCode
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('suggestedCode').textContent = data.suggestion || 'No suggestions available';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('suggestedCode').textContent = 'Error getting suggestions. Please try again.';
+            });
+        }
+
+        // Copy suggested code to clipboard
+        function copySuggestedCode() {
+            const suggestedCode = document.getElementById('suggestedCode').textContent;
+            navigator.clipboard.writeText(suggestedCode).then(() => {
+                const copySuccess = document.getElementById('copySuccess');
+                copySuccess.style.display = 'block';
+                setTimeout(() => {
+                    copySuccess.style.display = 'none';
+                }, 2000);
+            });
+        }
+
+        // Search vulnerabilities
+        function searchVulnerabilities() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const items = document.querySelectorAll('.vulnerability-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize the page when loaded
+        window.onload = function() {
+            loadVulnerabilities();
+            
+            // Add search input event listener
+            document.getElementById('searchInput').addEventListener('keyup', searchVulnerabilities);
+            
+            // Show code input tab by default
+            switchTab('input');
+        };
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+                <circle cx="12" cy="12" r="10" fill="#2e4ef4" />
+                <path d="M8 12l3 3 5-5" stroke="white" stroke-width="2" fill="none" />
+            </svg>
+            BUG Bounty
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="#">Scan</a>
+            <a href="report.html">Report</a>
+            <a href="#" class="active">Code Suggestion</a>
+        </div>
+        <div class="auth-buttons">
+            <button class="login-btn">
+                <svg class="login-icon" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="#5871ed" stroke-width="2" fill="none" />
+                </svg>
+                Log In
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Vulnerabilities</h2>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="searchInput" placeholder="Search vulnerabilities...">
+            </div>
+            <div class="sidebar-categories">
+                <div class="category">
+                    <div class="category-header high" onclick="toggleCategory('highRisk')">
+                        <span>High Risk</span>
+                        <span class="category-count" id="highCount">0</span>
+                    </div>
+                    <ul id="highRiskList" class="vulnerability-list">
+                        <!-- High risk vulnerabilities will be loaded here -->
+                    </ul>
+                </div>
+                <div class="category">
+                    <div class="category-header medium" onclick="toggleCategory('mediumRisk')">
+                        <span>Medium Risk</span>
+                        <span class="category-count" id="mediumCount">0</span>
+                    </div>
+                    <ul id="mediumRiskList" class="vulnerability-list">
+                        <!-- Medium risk vulnerabilities will be loaded here -->
+                    </ul>
+                </div>
+                <div class="category">
+                    <div class="category-header low" onclick="toggleCategory('lowRisk')">
+                        <span>Low Risk</span>
+                        <span class="category-count" id="lowCount">0</span>
+                    </div>
+                    <ul id="lowRiskList" class="vulnerability-list">
+                        <!-- Low risk vulnerabilities will be loaded here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="suggestion-header">
+                <h2 id="issueTitle">Select a vulnerability from the sidebar</h2>
+                <p>Risk: <span id="issueRisk">-</span> | Confidence: <span id="issueConfidence">-</span></p>
+            </div>
+            <div class="suggestion-content">
+                <div class="issue-details" id="issueDetails">
+                    <p>Please select a vulnerability from the sidebar to view details and get code suggestions.</p>
+                </div>
+                <div class="code-area">
+                    <div class="code-tabs">
+                        <div id="inputTab" class="code-tab active" onclick="switchTab('input')">Your Code</div>
+                        <div id="suggestionTab" class="code-tab" onclick="switchTab('suggestion')">Suggested Code</div>
+                    </div>
+                    <div id="inputPanel" class="code-panel active">
+                        <div class="code-header">
+                            <div class="code-title">Paste your code here (optional)</div>
+                        </div>
+                        <textarea id="userCode" class="code-input" placeholder="Paste your vulnerable code here to get more specific suggestions..."></textarea>
+                        <div class="suggestion-actions">
+                            <button class="suggestion-btn get-suggestion" onclick="getCodeSuggestions()">Get Code Suggestions</button>
+                        </div>
+                    </div>
+                    <div id="suggestionPanel" class="code-panel">
+                        <div class="code-header">
+                            <div class="code-title">AI-generated code suggestions</div>
+                            <div class="code-actions">
+                                <button onclick="copySuggestedCode()">Copy Code</button>
+                            </div>
+                        </div>
+                        <div id="suggestedCode" class="code-container">
+                            Select a vulnerability and click "Get Code Suggestions" to receive AI-generated code recommendations.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="copySuccess" class="copy-success">Code copied to clipboard!</div>
+</body>
+</html>
